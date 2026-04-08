@@ -1,0 +1,21 @@
+{
+  "name": "linklocker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LinkLocker monorepo",
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "turbo": "^2.9.5"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@linklocker/database",
+  "version": "1.0.0",
+  "description": "LinkLocker SQLite database component",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "echo \"No build step\"",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.7"
+  }
+}
