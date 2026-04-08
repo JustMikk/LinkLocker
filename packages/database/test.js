@@ -10,7 +10,7 @@ async function runTest() {
     "https://example.com",
     "Example",
     "test,bookmark",
-    "Created from test script"
+    "Created from test script",
   );
   console.log("save:", saveResult);
 

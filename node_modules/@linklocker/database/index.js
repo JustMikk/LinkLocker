@@ -64,8 +64,8 @@ function createDatabase(dbPath = "./linklocker.db") {
             url,
             title,
             tags,
-            notes
-          }
+            notes,
+          },
         };
       } catch (error) {
         return { success: false, error: error.message };
@@ -74,7 +74,9 @@ function createDatabase(dbPath = "./linklocker.db") {
 
     async getAll() {
       try {
-        const rows = await all("SELECT * FROM bookmarks ORDER BY created_at DESC");
+        const rows = await all(
+          "SELECT * FROM bookmarks ORDER BY created_at DESC",
+        );
         return { success: true, data: rows };
       } catch (error) {
         return { success: false, error: error.message };
@@ -88,13 +90,13 @@ function createDatabase(dbPath = "./linklocker.db") {
           success: true,
           data: {
             deletedId: id,
-            changes: result.changes
-          }
+            changes: result.changes,
+          },
         };
       } catch (error) {
         return { success: false, error: error.message };
       }
-    }
+    },
   };
 }
 
