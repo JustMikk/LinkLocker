@@ -25,6 +25,34 @@ function ask(question) {
   });
 }
 
+function isValidUrl(url) {
+  const trimmed = (url || "").trim();
+  return trimmed.startsWith("http://") || trimmed.startsWith("https://");
+}
+
+function normalizeBookmarkInput(urlInput, titleInput, tagsInput, notesInput) {
+  const url = (urlInput || "").trim();
+  const title = (titleInput || "").trim() || url;
+  const tags = (tagsInput || "").trim();
+  const notes = (notesInput || "").trim();
+
+  if (!url) {
+    return { success: false, error: "URL is required" };
+  }
+
+  if (!isValidUrl(url)) {
+    return {
+      success: false,
+      error: "URL must start with http:// or https://",
+    };
+  }
+
+  return {
+    success: true,
+    data: { url, title, tags, notes },
+  };
+}
+
 function printBookmarkList(items) {
   if (!items.length) {
     console.log("No bookmarks yet");
@@ -41,69 +69,99 @@ function printBookmarkList(items) {
 }
 
 async function addBookmark() {
-  const url = await ask("URL: ");
-  if (url === null) {
-    return;
-  }
+  try {
+    const url = await ask("URL: ");
+    if (url === null) {
+      return;
+    }
 
-  const title = await ask("Title: ");
-  if (title === null) {
-    return;
-  }
+    const title = await ask("Title: ");
+    if (title === null) {
+      return;
+    }
 
-  const tags = await ask("Tags (comma separated): ");
-  if (tags === null) {
-    return;
-  }
+    const tags = await ask("Tags (comma separated): ");
+    if (tags === null) {
+      return;
+    }
 
-  const notes = await ask("Notes: ");
-  if (notes === null) {
-    return;
-  }
+    const notes = await ask("Notes: ");
+    if (notes === null) {
+      return;
+    }
 
-  const result = await database.save(url, title, tags, notes);
-  if (result.success) {
-    console.log("Bookmark saved!");
-  } else {
-    console.log("Failed to save bookmark:", result.error);
+    const normalized = normalizeBookmarkInput(url, title, tags, notes);
+    if (!normalized.success) {
+      console.log("Invalid bookmark:", normalized.error);
+      return;
+    }
+
+    const result = await database.save(
+      normalized.data.url,
+      normalized.data.title,
+      normalized.data.tags,
+      normalized.data.notes,
+    );
+
+    if (result.success) {
+      console.log("Bookmark saved!");
+    } else {
+      console.log("Failed to save bookmark:", result.error);
+    }
+  } catch (error) {
+    console.log("Error while adding bookmark:", error.message);
   }
 }
 
 async function viewAllBookmarks() {
-  const result = await database.getAll();
-  if (!result.success) {
-    console.log("Failed to load bookmarks:", result.error);
-    return;
-  }
+  try {
+    const result = await database.getAll();
+    if (!result.success) {
+      console.log("Failed to load bookmarks:", result.error);
+      return;
+    }
 
-  printBookmarkList(result.data);
+    if (!result.data.length) {
+      console.log("No bookmarks yet. Add one from option 1.");
+      return;
+    }
+
+    printBookmarkList(result.data);
+  } catch (error) {
+    console.log("Error while loading bookmarks:", error.message);
+  }
 }
 
 async function deleteBookmark() {
-  const allResult = await database.getAll();
-  if (!allResult.success) {
-    console.log("Failed to load bookmarks:", allResult.error);
-    return;
-  }
+  try {
+    const allResult = await database.getAll();
+    if (!allResult.success) {
+      console.log("Failed to load bookmarks:", allResult.error);
+      return;
+    }
 
-  printBookmarkList(allResult.data);
-  if (!allResult.data.length) {
-    return;
-  }
+    printBookmarkList(allResult.data);
+    if (!allResult.data.length) {
+      return;
+    }
 
-  const idInput = await ask("Enter ID to delete: ");
-  if (idInput === null) {
-    return;
-  }
+    const idInput = await ask("Enter ID to delete: ");
+    if (idInput === null) {
+      return;
+    }
 
-  const result = await database.delete(Number(idInput));
+    const id = Number(idInput);
+    const result = await database.delete(id);
 
-  if (result.success && result.data.changes > 0) {
-    console.log("Deleted!");
-  } else if (result.success) {
-    console.log("No bookmark deleted (ID may not exist).");
-  } else {
-    console.log("Failed to delete bookmark:", result.error);
+    if (result.success && result.data.changes > 0) {
+      console.log("Deleted!");
+    } else if (result.success) {
+      console.log("Bookmark not found");
+    } else {
+      console.log("Failed to delete bookmark:", result.error);
+    }
+  } catch (error) {
+    console.log("Error while deleting bookmark:", error.message);
   }
 }
 
