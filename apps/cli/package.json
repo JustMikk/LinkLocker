@@ -10,6 +10,6 @@
     "test": "echo \"No tests yet\""
   },
   "dependencies": {
-    "@linklocker/database": "workspace:*"
+    "@linklocker/bookmark-manager": "workspace:*"
   }
 }

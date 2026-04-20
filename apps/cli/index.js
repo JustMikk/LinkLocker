@@ -1,9 +1,7 @@
 const readline = require("readline");
-const path = require("path");
-const createDatabase = require("@linklocker/database");
+const createBookmarkManager = require("@linklocker/bookmark-manager");
 
-const dbPath = path.resolve(__dirname, "../../packages/database/linklocker.db");
-const database = createDatabase(dbPath);
+const bookmarkManager = createBookmarkManager();
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -23,34 +21,6 @@ function ask(question) {
       resolve(null);
     }
   });
-}
-
-function isValidUrl(url) {
-  const trimmed = (url || "").trim();
-  return trimmed.startsWith("http://") || trimmed.startsWith("https://");
-}
-
-function normalizeBookmarkInput(urlInput, titleInput, tagsInput, notesInput) {
-  const url = (urlInput || "").trim();
-  const title = (titleInput || "").trim() || url;
-  const tags = (tagsInput || "").trim();
-  const notes = (notesInput || "").trim();
-
-  if (!url) {
-    return { success: false, error: "URL is required" };
-  }
-
-  if (!isValidUrl(url)) {
-    return {
-      success: false,
-      error: "URL must start with http:// or https://",
-    };
-  }
-
-  return {
-    success: true,
-    data: { url, title, tags, notes },
-  };
 }
 
 function printBookmarkList(items) {
@@ -90,23 +60,12 @@ async function addBookmark() {
       return;
     }
 
-    const normalized = normalizeBookmarkInput(url, title, tags, notes);
-    if (!normalized.success) {
-      console.log("Invalid bookmark:", normalized.error);
-      return;
-    }
-
-    const result = await database.save(
-      normalized.data.url,
-      normalized.data.title,
-      normalized.data.tags,
-      normalized.data.notes,
-    );
+    const result = await bookmarkManager.addBookmark(url, title, tags, notes);
 
     if (result.success) {
       console.log("Bookmark saved!");
     } else {
-      console.log("Failed to save bookmark:", result.error);
+      console.log("Invalid bookmark:", result.error);
     }
   } catch (error) {
     console.log("Error while adding bookmark:", error.message);
@@ -115,7 +74,7 @@ async function addBookmark() {
 
 async function viewAllBookmarks() {
   try {
-    const result = await database.getAll();
+    const result = await bookmarkManager.getAllBookmarks();
     if (!result.success) {
       console.log("Failed to load bookmarks:", result.error);
       return;
@@ -134,7 +93,7 @@ async function viewAllBookmarks() {
 
 async function deleteBookmark() {
   try {
-    const allResult = await database.getAll();
+    const allResult = await bookmarkManager.getAllBookmarks();
     if (!allResult.success) {
       console.log("Failed to load bookmarks:", allResult.error);
       return;
@@ -150,8 +109,7 @@ async function deleteBookmark() {
       return;
     }
 
-    const id = Number(idInput);
-    const result = await database.delete(id);
+    const result = await bookmarkManager.deleteBookmark(idInput);
 
     if (result.success && result.data.changes > 0) {
       console.log("Deleted!");
@@ -195,13 +153,6 @@ async function menuLoop() {
 }
 
 async function main() {
-  const initResult = await database.init();
-  if (!initResult.success) {
-    console.log("Failed to initialize database:", initResult.error);
-    rl.close();
-    return;
-  }
-
   await menuLoop();
   rl.close();
 }

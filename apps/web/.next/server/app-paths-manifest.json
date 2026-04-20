@@ -1,0 +1,4 @@
+{
+  "/api/bookmarks/route": "app/api/bookmarks/route.js",
+  "/page": "app/page.js"
+}

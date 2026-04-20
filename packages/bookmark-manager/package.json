@@ -1,0 +1,9 @@
+{
+  "name": "@linklocker/bookmark-manager",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "commonjs",
+  "dependencies": {
+    "@linklocker/database": "workspace:*"
+  }
+}
