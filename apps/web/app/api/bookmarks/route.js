@@ -12,7 +12,10 @@ function getBookmarkManagerFactory() {
 
 function getBookmarkManager() {
   const createBookmarkManager = getBookmarkManagerFactory();
-  const dbPath = path.resolve(process.cwd(), "../../packages/database/linklocker.db");
+  const dbPath = path.resolve(
+    process.cwd(),
+    "../../packages/database/linklocker.db",
+  );
   return createBookmarkManager({ dbPath });
 }
 

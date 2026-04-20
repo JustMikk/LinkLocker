@@ -76,7 +76,9 @@ export default function HomePage() {
       <div className="grid gap-4">
         {bookmarks.map((bookmark) => (
           <article key={bookmark.id} className="rounded bg-white p-4 shadow">
-            <h2 className="text-xl font-semibold">{bookmark.title || bookmark.url}</h2>
+            <h2 className="text-xl font-semibold">
+              {bookmark.title || bookmark.url}
+            </h2>
             <a
               href={bookmark.url}
               target="_blank"
@@ -85,7 +87,9 @@ export default function HomePage() {
             >
               {bookmark.url}
             </a>
-            <p className="mt-2 text-sm text-slate-600">Tags: {bookmark.tags || ""}</p>
+            <p className="mt-2 text-sm text-slate-600">
+              Tags: {bookmark.tags || ""}
+            </p>
             <button
               type="button"
               onClick={() => void deleteBookmark(bookmark.id)}

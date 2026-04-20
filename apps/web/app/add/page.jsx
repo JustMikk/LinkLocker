@@ -49,7 +49,10 @@ export default function AddBookmarkPage() {
         </Link>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-3 rounded bg-white p-4 shadow">
+      <form
+        onSubmit={onSubmit}
+        className="space-y-3 rounded bg-white p-4 shadow"
+      >
         <div>
           <label className="mb-1 block font-medium">URL (required)</label>
           <input
