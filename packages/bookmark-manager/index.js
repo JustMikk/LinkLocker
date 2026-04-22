@@ -149,12 +149,15 @@ function createBookmarkManager(options = {}) {
         return allResult;
       }
 
-      const existing = allResult.data.find((bookmark) => bookmark.id === numericId);
+      const existing = allResult.data.find(
+        (bookmark) => bookmark.id === numericId,
+      );
       if (!existing) {
         return { success: false, error: "Bookmark not found" };
       }
 
-      const nextUrl = updates && updates.url !== undefined ? updates.url : existing.url;
+      const nextUrl =
+        updates && updates.url !== undefined ? updates.url : existing.url;
       const validatedUrl = _validateUrl(nextUrl);
       if (!validatedUrl.success) {
         return validatedUrl;
@@ -166,7 +169,9 @@ function createBookmarkManager(options = {}) {
           ? (updates.title || "").trim() || cleanUrl
           : existing.title || cleanUrl;
       const cleanTags = _formatTagsForStorage(
-        _parseTags(updates && updates.tags !== undefined ? updates.tags : existing.tags),
+        _parseTags(
+          updates && updates.tags !== undefined ? updates.tags : existing.tags,
+        ),
       );
       const cleanNotes =
         updates && updates.notes !== undefined
@@ -222,7 +227,9 @@ function createBookmarkManager(options = {}) {
       }
 
       const filtered = allResult.data.filter((bookmark) => {
-        const tagList = _parseTags(bookmark.tags).map((item) => item.toLowerCase());
+        const tagList = _parseTags(bookmark.tags).map((item) =>
+          item.toLowerCase(),
+        );
         return tagList.includes(queryTag);
       });
 

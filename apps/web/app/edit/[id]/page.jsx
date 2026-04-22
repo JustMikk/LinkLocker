@@ -111,14 +111,22 @@ export default function EditBookmarkPage() {
     <main className="container-page">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Edit Bookmark</h1>
-        <Link href="/" className="text-sm font-medium text-slate-600 underline underline-offset-4">
+        <Link
+          href="/"
+          className="text-sm font-medium text-slate-600 underline underline-offset-4"
+        >
           Cancel
         </Link>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <form
+        onSubmit={onSubmit}
+        className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+      >
         <div>
-          <label className="mb-1 block text-sm font-semibold text-slate-700">URL (required)</label>
+          <label className="mb-1 block text-sm font-semibold text-slate-700">
+            URL (required)
+          </label>
           <input
             value={url}
             onChange={(e) => setUrl(e.target.value)}
@@ -128,7 +136,9 @@ export default function EditBookmarkPage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-semibold text-slate-700">Title (optional)</label>
+          <label className="mb-1 block text-sm font-semibold text-slate-700">
+            Title (optional)
+          </label>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -137,7 +147,9 @@ export default function EditBookmarkPage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-semibold text-slate-700">Tags (optional)</label>
+          <label className="mb-1 block text-sm font-semibold text-slate-700">
+            Tags (optional)
+          </label>
           <input
             value={tags}
             onChange={(e) => setTags(e.target.value)}
@@ -147,8 +159,12 @@ export default function EditBookmarkPage() {
 
         <div>
           <div className="mb-1 flex items-center justify-between">
-            <label className="block text-sm font-semibold text-slate-700">Notes (optional)</label>
-            <span className="text-xs text-slate-500">{notes.length}/{notesLimit}</span>
+            <label className="block text-sm font-semibold text-slate-700">
+              Notes (optional)
+            </label>
+            <span className="text-xs text-slate-500">
+              {notes.length}/{notesLimit}
+            </span>
           </div>
           <textarea
             value={notes}
@@ -159,8 +175,16 @@ export default function EditBookmarkPage() {
           />
         </div>
 
-        {error && <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">{error}</p>}
-        {success && <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-800">{success}</p>}
+        {error && (
+          <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+            {error}
+          </p>
+        )}
+        {success && (
+          <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-800">
+            {success}
+          </p>
+        )}
 
         <div className="flex items-center gap-3">
           <button
@@ -170,7 +194,10 @@ export default function EditBookmarkPage() {
           >
             {saving ? "Saving..." : "Update Bookmark"}
           </button>
-          <Link href="/" className="rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-700 transition hover:bg-slate-50">
+          <Link
+            href="/"
+            className="rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-700 transition hover:bg-slate-50"
+          >
             Cancel
           </Link>
         </div>

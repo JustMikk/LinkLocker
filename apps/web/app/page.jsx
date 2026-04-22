@@ -37,9 +37,7 @@ export default function HomePage() {
   }
 
   async function deleteBookmark(id, title) {
-    const confirmed = window.confirm(
-      `Delete \"${title || "this bookmark"}\"?`,
-    );
+    const confirmed = window.confirm(`Delete \"${title || "this bookmark"}\"?`);
     if (!confirmed) {
       return;
     }
@@ -74,7 +72,9 @@ export default function HomePage() {
       <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Your bookmarks</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Your bookmarks
+            </h1>
             <p className="mt-1 text-sm text-slate-600">
               Filter by tag, edit bookmarks, and keep one shared SQLite database
               across web and CLI.
@@ -109,7 +109,11 @@ export default function HomePage() {
           Loading bookmarks...
         </div>
       )}
-      {error && <p className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">{error}</p>}
+      {error && (
+        <p className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+          {error}
+        </p>
+      )}
 
       {!loading && !error && bookmarks.length === 0 && (
         <p className="rounded-2xl border border-slate-200 bg-white p-6 text-slate-600 shadow-sm">

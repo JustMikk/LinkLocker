@@ -13,7 +13,10 @@ export default function RootLayout({ children }) {
         <div className="min-h-screen bg-slate-100 text-slate-900">
           <header className="border-b border-slate-200 bg-white/90 backdrop-blur">
             <div className="container-page flex items-center justify-between py-4">
-              <Link href="/" className="text-xl font-black tracking-tight text-slate-900">
+              <Link
+                href="/"
+                className="text-xl font-black tracking-tight text-slate-900"
+              >
                 LinkLocker
               </Link>
 

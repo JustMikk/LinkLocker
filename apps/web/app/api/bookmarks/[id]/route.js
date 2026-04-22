@@ -27,7 +27,9 @@ export async function GET(request, { params }) {
     return NextResponse.json(result, { status: 500 });
   }
 
-  const bookmark = result.data.find((item) => String(item.id) === String(params.id));
+  const bookmark = result.data.find(
+    (item) => String(item.id) === String(params.id),
+  );
   if (!bookmark) {
     return NextResponse.json(
       { success: false, error: "Bookmark not found" },
