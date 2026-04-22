@@ -38,6 +38,16 @@ function printBookmarkList(items) {
   }
 }
 
+function printSearchResults(tag, items) {
+  if (!items.length) {
+    console.log(`No bookmarks found for tag: ${tag}`);
+    return;
+  }
+
+  console.log(`Bookmarks with tag: ${tag}`);
+  printBookmarkList(items);
+}
+
 async function addBookmark() {
   try {
     const url = await ask("URL: ");
@@ -123,6 +133,25 @@ async function deleteBookmark() {
   }
 }
 
+async function searchBookmarksByTag() {
+  try {
+    const tag = await ask("Enter tag to search: ");
+    if (tag === null) {
+      return;
+    }
+
+    const result = await bookmarkManager.searchByTag(tag);
+    if (!result.success) {
+      console.log("Failed to search bookmarks:", result.error);
+      return;
+    }
+
+    printSearchResults(tag.trim(), result.data);
+  } catch (error) {
+    console.log("Error while searching bookmarks:", error.message);
+  }
+}
+
 async function menuLoop() {
   while (true) {
     console.log("\nLinkLocker Menu");
@@ -130,6 +159,7 @@ async function menuLoop() {
     console.log("2. View all bookmarks");
     console.log("3. Delete bookmark");
     console.log("4. Exit");
+    console.log("5. Search by tag");
 
     const choice = await ask("Select an option: ");
     if (choice === null) {
@@ -146,6 +176,8 @@ async function menuLoop() {
     } else if (choice === "4") {
       console.log("Goodbye!");
       break;
+    } else if (choice === "5") {
+      await searchBookmarksByTag();
     } else {
       console.log("Invalid option, try again.");
     }

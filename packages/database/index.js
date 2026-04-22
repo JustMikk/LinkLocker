@@ -97,6 +97,30 @@ function createDatabase(dbPath = "./linklocker.db") {
         return { success: false, error: error.message };
       }
     },
+
+    async update(id, url, title, tags, notes) {
+      try {
+        const sql = `
+          UPDATE bookmarks
+          SET url = ?, title = ?, tags = ?, notes = ?
+          WHERE id = ?
+        `;
+        const result = await run(sql, [url, title, tags, notes, id]);
+        return {
+          success: true,
+          data: {
+            updatedId: id,
+            changes: result.changes,
+            url,
+            title,
+            tags,
+            notes,
+          },
+        };
+      } catch (error) {
+        return { success: false, error: error.message };
+      }
+    },
   };
 }
 

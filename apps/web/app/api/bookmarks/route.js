@@ -19,9 +19,13 @@ function getBookmarkManager() {
   return createBookmarkManager({ dbPath });
 }
 
-export async function GET() {
+export async function GET(request) {
   const manager = getBookmarkManager();
-  const result = await manager.getAllBookmarks();
+  const requestUrl = new URL(request.url);
+  const tag = requestUrl.searchParams.get("tag");
+  const result = tag
+    ? await manager.searchByTag(tag)
+    : await manager.getAllBookmarks();
 
   if (!result.success) {
     return NextResponse.json(result, { status: 500 });

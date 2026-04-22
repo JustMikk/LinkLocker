@@ -9,6 +9,7 @@ const PROVIDED_SERVICES = [
   "addBookmark",
   "getAllBookmarks",
   "deleteBookmark",
+  "updateBookmark",
   "searchByTag",
 ];
 
@@ -63,6 +64,13 @@ function createBookmarkManager(options = {}) {
     return tagsArray.join(",");
   }
 
+  function _normalizeBookmarkRecord(record) {
+    return {
+      ...record,
+      tags: _formatTagsForStorage(_parseTags(record.tags)),
+    };
+  }
+
   async function addBookmark(url, title, tags, notes) {
     try {
       const initResult = await ensureInitialized();
@@ -98,10 +106,7 @@ function createBookmarkManager(options = {}) {
         return result;
       }
 
-      const mapped = result.data.map((item) => ({
-        ...item,
-        tags: _formatTagsForStorage(_parseTags(item.tags)),
-      }));
+      const mapped = result.data.map(_normalizeBookmarkRecord);
 
       return { success: true, data: mapped };
     } catch (error) {
@@ -127,14 +132,111 @@ function createBookmarkManager(options = {}) {
     }
   }
 
+  async function updateBookmark(id, updates) {
+    try {
+      const initResult = await ensureInitialized();
+      if (!initResult.success) {
+        return initResult;
+      }
+
+      const numericId = Number(id);
+      if (!Number.isInteger(numericId) || numericId <= 0) {
+        return { success: false, error: "Invalid bookmark ID" };
+      }
+
+      const allResult = await getAllBookmarks();
+      if (!allResult.success) {
+        return allResult;
+      }
+
+      const existing = allResult.data.find((bookmark) => bookmark.id === numericId);
+      if (!existing) {
+        return { success: false, error: "Bookmark not found" };
+      }
+
+      const nextUrl = updates && updates.url !== undefined ? updates.url : existing.url;
+      const validatedUrl = _validateUrl(nextUrl);
+      if (!validatedUrl.success) {
+        return validatedUrl;
+      }
+
+      const cleanUrl = validatedUrl.data;
+      const cleanTitle =
+        updates && updates.title !== undefined
+          ? (updates.title || "").trim() || cleanUrl
+          : existing.title || cleanUrl;
+      const cleanTags = _formatTagsForStorage(
+        _parseTags(updates && updates.tags !== undefined ? updates.tags : existing.tags),
+      );
+      const cleanNotes =
+        updates && updates.notes !== undefined
+          ? (updates.notes || "").trim()
+          : existing.notes || "";
+
+      const result = await database.update(
+        numericId,
+        cleanUrl,
+        cleanTitle,
+        cleanTags,
+        cleanNotes,
+      );
+
+      if (!result.success) {
+        return result;
+      }
+
+      if (!result.data.changes) {
+        return { success: false, error: "Bookmark not found" };
+      }
+
+      return {
+        success: true,
+        data: {
+          id: numericId,
+          url: cleanUrl,
+          title: cleanTitle,
+          tags: cleanTags,
+          notes: cleanNotes,
+        },
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
   async function searchByTag(tag) {
-    return { success: true, data: [] };
+    try {
+      const initResult = await ensureInitialized();
+      if (!initResult.success) {
+        return initResult;
+      }
+
+      const queryTag = (tag || "").trim().toLowerCase();
+      if (!queryTag) {
+        return { success: true, data: [] };
+      }
+
+      const allResult = await getAllBookmarks();
+      if (!allResult.success) {
+        return allResult;
+      }
+
+      const filtered = allResult.data.filter((bookmark) => {
+        const tagList = _parseTags(bookmark.tags).map((item) => item.toLowerCase());
+        return tagList.includes(queryTag);
+      });
+
+      return { success: true, data: filtered };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
   }
 
   return {
     addBookmark,
     getAllBookmarks,
     deleteBookmark,
+    updateBookmark,
     searchByTag,
   };
 }
