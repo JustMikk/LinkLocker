@@ -8,6 +8,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [tagFilter, setTagFilter] = useState("");
+  const [lastUpdated, setLastUpdated] = useState("");
 
   async function loadBookmarks(filter = tagFilter) {
     setLoading(true);
@@ -27,6 +28,7 @@ export default function HomePage() {
         setBookmarks([]);
       } else {
         setBookmarks(result.data || []);
+        setLastUpdated(new Date().toLocaleString());
       }
     } catch (err) {
       setError("Failed to load bookmarks");
@@ -78,6 +80,9 @@ export default function HomePage() {
             <p className="mt-1 text-sm text-slate-600">
               Filter by tag, edit bookmarks, and keep one shared SQLite database
               across web and CLI.
+            </p>
+            <p className="mt-1 text-xs text-slate-500">
+              Last updated: {lastUpdated || "Not loaded yet"}
             </p>
           </div>
 

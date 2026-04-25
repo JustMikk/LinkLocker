@@ -4,8 +4,11 @@
   "private": true,
   "description": "LinkLocker monorepo",
   "scripts": {
+    "dev:web": "cd apps/web && npm run dev",
+    "dev:cli": "node apps/cli/index.js",
+    "setup": "npm install && cd apps/web && npm install",
     "build": "turbo run build",
-    "test": "turbo run test"
+    "test": "cd packages/bookmark-manager && node test.js"
   },
   "workspaces": [
     "apps/*",

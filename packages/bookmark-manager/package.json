@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "commonjs",
+  "scripts": {
+    "test": "node test.js"
+  },
   "dependencies": {
-    "@linklocker/database": "workspace:*"
+    "@linklocker/database": "file:../database"
   }
 }

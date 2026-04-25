@@ -8,6 +8,15 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
+function toFriendlyError(message) {
+  const text = String(message || "Unknown error");
+  if (text.toLowerCase().includes("database")) {
+    return "Database error. Check if file exists.";
+  }
+
+  return text;
+}
+
 function ask(question) {
   return new Promise((resolve) => {
     if (rl.closed || !process.stdin.readable) {
@@ -75,10 +84,10 @@ async function addBookmark() {
     if (result.success) {
       console.log("Bookmark saved!");
     } else {
-      console.log("Invalid bookmark:", result.error);
+      console.log("Invalid bookmark:", toFriendlyError(result.error));
     }
   } catch (error) {
-    console.log("Error while adding bookmark:", error.message);
+    console.log("Error while adding bookmark:", toFriendlyError(error.message));
   }
 }
 
@@ -86,7 +95,7 @@ async function viewAllBookmarks() {
   try {
     const result = await bookmarkManager.getAllBookmarks();
     if (!result.success) {
-      console.log("Failed to load bookmarks:", result.error);
+      console.log("Failed to load bookmarks:", toFriendlyError(result.error));
       return;
     }
 
@@ -97,7 +106,7 @@ async function viewAllBookmarks() {
 
     printBookmarkList(result.data);
   } catch (error) {
-    console.log("Error while loading bookmarks:", error.message);
+    console.log("Error while loading bookmarks:", toFriendlyError(error.message));
   }
 }
 
@@ -105,7 +114,7 @@ async function deleteBookmark() {
   try {
     const allResult = await bookmarkManager.getAllBookmarks();
     if (!allResult.success) {
-      console.log("Failed to load bookmarks:", allResult.error);
+      console.log("Failed to load bookmarks:", toFriendlyError(allResult.error));
       return;
     }
 
@@ -126,10 +135,10 @@ async function deleteBookmark() {
     } else if (result.success) {
       console.log("Bookmark not found");
     } else {
-      console.log("Failed to delete bookmark:", result.error);
+      console.log("Failed to delete bookmark:", toFriendlyError(result.error));
     }
   } catch (error) {
-    console.log("Error while deleting bookmark:", error.message);
+    console.log("Error while deleting bookmark:", toFriendlyError(error.message));
   }
 }
 
@@ -142,13 +151,13 @@ async function searchBookmarksByTag() {
 
     const result = await bookmarkManager.searchByTag(tag);
     if (!result.success) {
-      console.log("Failed to search bookmarks:", result.error);
+      console.log("Failed to search bookmarks:", toFriendlyError(result.error));
       return;
     }
 
     printSearchResults(tag.trim(), result.data);
   } catch (error) {
-    console.log("Error while searching bookmarks:", error.message);
+    console.log("Error while searching bookmarks:", toFriendlyError(error.message));
   }
 }
 
@@ -190,6 +199,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error("Unexpected CLI error:", error.message);
+  console.error("Unexpected CLI error:", toFriendlyError(error.message));
   rl.close();
 });

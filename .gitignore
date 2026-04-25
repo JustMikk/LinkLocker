@@ -32,6 +32,7 @@ packages/*/.turbo/
 
 # Local database/runtime files
 packages/database/linklocker.db
+packages/bookmark-manager/test.db
 *.sqlite
 *.sqlite3
 

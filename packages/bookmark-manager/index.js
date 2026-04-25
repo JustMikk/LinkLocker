@@ -11,6 +11,7 @@ const PROVIDED_SERVICES = [
   "deleteBookmark",
   "updateBookmark",
   "searchByTag",
+  "close",
 ];
 
 function createBookmarkManager(options = {}) {
@@ -19,6 +20,23 @@ function createBookmarkManager(options = {}) {
   const database = createDatabase(dbPath);
   let initialized = false;
 
+  function _formatDatabaseError(error) {
+    if (!error || !error.message) {
+      return "Database error. Check if file exists.";
+    }
+
+    const message = String(error.message);
+    if (
+      message.includes("SQLITE") ||
+      message.includes("database") ||
+      message.includes("open")
+    ) {
+      return "Database error. Check if file exists.";
+    }
+
+    return message;
+  }
+
   async function ensureInitialized() {
     if (initialized) {
       return { success: true, data: { initialized: true } };
@@ -26,7 +44,10 @@ function createBookmarkManager(options = {}) {
 
     const initResult = await database.init();
     if (!initResult.success) {
-      return initResult;
+      return {
+        success: false,
+        error: _formatDatabaseError(initResult.error),
+      };
     }
 
     initialized = true;
@@ -90,7 +111,7 @@ function createBookmarkManager(options = {}) {
 
       return await database.save(cleanUrl, cleanTitle, cleanTags, cleanNotes);
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: _formatDatabaseError(error) };
     }
   }
 
@@ -103,15 +124,32 @@ function createBookmarkManager(options = {}) {
 
       const result = await database.getAll();
       if (!result.success) {
-        return result;
+        return {
+          success: false,
+          error: _formatDatabaseError(result.error),
+        };
       }
 
       const mapped = result.data.map(_normalizeBookmarkRecord);
 
       return { success: true, data: mapped };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: _formatDatabaseError(error) };
     }
+  }
+
+  async function _findBookmarkById(numericId) {
+    const allResult = await getAllBookmarks();
+    if (!allResult.success) {
+      return allResult;
+    }
+
+    const existing = allResult.data.find((bookmark) => bookmark.id === numericId);
+    if (!existing) {
+      return { success: false, error: "Bookmark not found" };
+    }
+
+    return { success: true, data: existing };
   }
 
   async function deleteBookmark(id) {
@@ -126,9 +164,22 @@ function createBookmarkManager(options = {}) {
         return { success: false, error: "Invalid bookmark ID" };
       }
 
-      return await database.delete(numericId);
+      const existingResult = await _findBookmarkById(numericId);
+      if (!existingResult.success) {
+        return existingResult;
+      }
+
+      const result = await database.delete(numericId);
+      if (!result.success) {
+        return {
+          success: false,
+          error: _formatDatabaseError(result.error),
+        };
+      }
+
+      return result;
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: _formatDatabaseError(error) };
     }
   }
 
@@ -144,17 +195,11 @@ function createBookmarkManager(options = {}) {
         return { success: false, error: "Invalid bookmark ID" };
       }
 
-      const allResult = await getAllBookmarks();
-      if (!allResult.success) {
-        return allResult;
+      const existingResult = await _findBookmarkById(numericId);
+      if (!existingResult.success) {
+        return existingResult;
       }
-
-      const existing = allResult.data.find(
-        (bookmark) => bookmark.id === numericId,
-      );
-      if (!existing) {
-        return { success: false, error: "Bookmark not found" };
-      }
+      const existing = existingResult.data;
 
       const nextUrl =
         updates && updates.url !== undefined ? updates.url : existing.url;
@@ -187,7 +232,10 @@ function createBookmarkManager(options = {}) {
       );
 
       if (!result.success) {
-        return result;
+        return {
+          success: false,
+          error: _formatDatabaseError(result.error),
+        };
       }
 
       if (!result.data.changes) {
@@ -205,7 +253,7 @@ function createBookmarkManager(options = {}) {
         },
       };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: _formatDatabaseError(error) };
     }
   }
 
@@ -235,7 +283,28 @@ function createBookmarkManager(options = {}) {
 
       return { success: true, data: filtered };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: _formatDatabaseError(error) };
+    }
+  }
+
+  async function close() {
+    try {
+      if (typeof database.close !== "function") {
+        return { success: true, data: { closed: false } };
+      }
+
+      const result = await database.close();
+      if (!result.success) {
+        return {
+          success: false,
+          error: _formatDatabaseError(result.error),
+        };
+      }
+
+      initialized = false;
+      return { success: true, data: { closed: true } };
+    } catch (error) {
+      return { success: false, error: _formatDatabaseError(error) };
     }
   }
 
@@ -245,6 +314,7 @@ function createBookmarkManager(options = {}) {
     deleteBookmark,
     updateBookmark,
     searchByTag,
+    close,
   };
 }
 

@@ -19,55 +19,65 @@ function getBookmarkManager() {
   return createBookmarkManager({ dbPath });
 }
 
+function errorResponse(message, status) {
+  return NextResponse.json({ error: message }, { status });
+}
+
 export async function GET(request, { params }) {
-  const manager = getBookmarkManager();
-  const result = await manager.getAllBookmarks();
+  try {
+    const manager = getBookmarkManager();
+    const result = await manager.getAllBookmarks();
 
-  if (!result.success) {
-    return NextResponse.json(result, { status: 500 });
-  }
+    if (!result.success) {
+      return errorResponse("Internal server error", 500);
+    }
 
-  const bookmark = result.data.find(
-    (item) => String(item.id) === String(params.id),
-  );
-  if (!bookmark) {
-    return NextResponse.json(
-      { success: false, error: "Bookmark not found" },
-      { status: 404 },
+    const bookmark = result.data.find(
+      (item) => String(item.id) === String(params.id),
     );
-  }
+    if (!bookmark) {
+      return errorResponse("Bookmark not found", 404);
+    }
 
-  return NextResponse.json({ success: true, data: bookmark });
+    return NextResponse.json({ success: true, data: bookmark }, { status: 200 });
+  } catch (error) {
+    return errorResponse("Internal server error", 500);
+  }
 }
 
 export async function PUT(request, { params }) {
-  const manager = getBookmarkManager();
-  const body = await request.json();
-  const result = await manager.updateBookmark(params.id, body);
+  try {
+    const manager = getBookmarkManager();
+    const body = await request.json();
+    const result = await manager.updateBookmark(params.id, body);
 
-  if (!result.success) {
-    const status = result.error === "Bookmark not found" ? 404 : 400;
-    return NextResponse.json(result, { status });
+    if (!result.success) {
+      const status = result.error === "Bookmark not found" ? 404 : 400;
+      return errorResponse(result.error || "Update failed", status);
+    }
+
+    return NextResponse.json(result, { status: 200 });
+  } catch (error) {
+    return errorResponse("Internal server error", 500);
   }
-
-  return NextResponse.json(result);
 }
 
 export async function DELETE(request, { params }) {
-  const manager = getBookmarkManager();
-  const result = await manager.deleteBookmark(params.id);
+  try {
+    const manager = getBookmarkManager();
+    const result = await manager.deleteBookmark(params.id);
 
-  if (!result.success) {
-    const status = result.error === "Bookmark not found" ? 404 : 400;
-    return NextResponse.json(result, { status });
+    if (!result.success) {
+      const status = result.error === "Bookmark not found" ? 404 : 400;
+      return errorResponse(result.error || "Delete failed", status);
+    }
+
+    if (result.data.changes === 0) {
+      return errorResponse("Bookmark not found", 404);
+    }
+
+    return NextResponse.json(result, { status: 200 });
+  } catch (error) {
+    return errorResponse("Internal server error", 500);
   }
-
-  if (result.success && result.data.changes === 0) {
-    return NextResponse.json(
-      { success: false, error: "Bookmark not found" },
-      { status: 404 },
-    );
-  }
-
-  return NextResponse.json(result);
 }

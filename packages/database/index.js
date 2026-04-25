@@ -29,6 +29,19 @@ function createDatabase(dbPath = "./linklocker.db") {
     });
   }
 
+  function closeDb() {
+    return new Promise((resolve, reject) => {
+      db.close((err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve();
+      });
+    });
+  }
+
   return {
     async init() {
       try {
@@ -117,6 +130,15 @@ function createDatabase(dbPath = "./linklocker.db") {
             notes,
           },
         };
+      } catch (error) {
+        return { success: false, error: error.message };
+      }
+    },
+
+    async close() {
+      try {
+        await closeDb();
+        return { success: true, data: { closed: true } };
       } catch (error) {
         return { success: false, error: error.message };
       }

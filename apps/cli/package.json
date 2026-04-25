@@ -10,6 +10,6 @@
     "test": "echo \"No tests yet\""
   },
   "dependencies": {
-    "@linklocker/bookmark-manager": "workspace:*"
+    "@linklocker/bookmark-manager": "file:../../packages/bookmark-manager"
   }
 }
