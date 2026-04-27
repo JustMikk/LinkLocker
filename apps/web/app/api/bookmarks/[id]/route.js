@@ -39,7 +39,10 @@ export async function GET(request, { params }) {
       return errorResponse("Bookmark not found", 404);
     }
 
-    return NextResponse.json({ success: true, data: bookmark }, { status: 200 });
+    return NextResponse.json(
+      { success: true, data: bookmark },
+      { status: 200 },
+    );
   } catch (error) {
     return errorResponse("Internal server error", 500);
   }

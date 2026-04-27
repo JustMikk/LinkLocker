@@ -144,7 +144,9 @@ function createBookmarkManager(options = {}) {
       return allResult;
     }
 
-    const existing = allResult.data.find((bookmark) => bookmark.id === numericId);
+    const existing = allResult.data.find(
+      (bookmark) => bookmark.id === numericId,
+    );
     if (!existing) {
       return { success: false, error: "Bookmark not found" };
     }

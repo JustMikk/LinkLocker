@@ -106,7 +106,10 @@ async function viewAllBookmarks() {
 
     printBookmarkList(result.data);
   } catch (error) {
-    console.log("Error while loading bookmarks:", toFriendlyError(error.message));
+    console.log(
+      "Error while loading bookmarks:",
+      toFriendlyError(error.message),
+    );
   }
 }
 
@@ -114,7 +117,10 @@ async function deleteBookmark() {
   try {
     const allResult = await bookmarkManager.getAllBookmarks();
     if (!allResult.success) {
-      console.log("Failed to load bookmarks:", toFriendlyError(allResult.error));
+      console.log(
+        "Failed to load bookmarks:",
+        toFriendlyError(allResult.error),
+      );
       return;
     }
 
@@ -138,7 +144,10 @@ async function deleteBookmark() {
       console.log("Failed to delete bookmark:", toFriendlyError(result.error));
     }
   } catch (error) {
-    console.log("Error while deleting bookmark:", toFriendlyError(error.message));
+    console.log(
+      "Error while deleting bookmark:",
+      toFriendlyError(error.message),
+    );
   }
 }
 
@@ -157,7 +166,10 @@ async function searchBookmarksByTag() {
 
     printSearchResults(tag.trim(), result.data);
   } catch (error) {
-    console.log("Error while searching bookmarks:", toFriendlyError(error.message));
+    console.log(
+      "Error while searching bookmarks:",
+      toFriendlyError(error.message),
+    );
   }
 }
 

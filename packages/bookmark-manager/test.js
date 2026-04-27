@@ -61,7 +61,11 @@ async function runTests() {
     "",
   );
   assert.strictEqual(emptyTagsResult.success, true);
-  assert.strictEqual(emptyTagsResult.data.tags, "", "empty tags should stay empty");
+  assert.strictEqual(
+    emptyTagsResult.data.tags,
+    "",
+    "empty tags should stay empty",
+  );
 
   // Database integration tests
   const allBeforeDelete = await manager.getAllBookmarks();
